@@ -1,0 +1,91 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+backend-refactoring-plan.md
+
+# Environment files (use docker-compose env instead)
+.env
+.env.local
+.env.production
+
+# Virtual environments
+.venv/
+env/
+venv/
+.conda/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Build artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Logs
+*.log
+logs/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ChromaDB data (mounted as volume)
+chroma_db/
+
+# Upload directories (mounted as volume)
+uploads/
+temp/
+tmp/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Data files (should be mounted as volumes)
+data/
+local_data/
+
+# Old/backup scripts
+S3_connection/
+data_ingestion/
+chatbot_logic.py

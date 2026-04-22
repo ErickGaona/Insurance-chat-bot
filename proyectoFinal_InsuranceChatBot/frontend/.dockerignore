@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+refactor frontend.md
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Old/backup files
+.old/
+*.bak
+*.backup
+*.old
+
+# Logs
+*.log
+logs/
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Keep only necessary files for static frontend:
+# - index.html
+# - styles.css
+# - js/
+# - assets/
+# - nginx.conf

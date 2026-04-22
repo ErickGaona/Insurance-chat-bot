@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnyoneAI Insurance Chatbot</title>
+    <link rel="icon" href="assets/anioneai.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Module preload for better performance -->
+    <link rel="modulepreload" href="js/main.js">
+    <link rel="modulepreload" href="js/config/api-config.js">
+    <link rel="modulepreload" href="js/services/api-service.js">
+    <link rel="modulepreload" href="js/components/chat-component.js">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="assets/anioneai.png" alt="AnyoneAI" class="logo">
+                    <div class="logo-text">
+                        <h1>AnyoneAI</h1>
+                        <span>Insurance Assistant</span>
+                    </div>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-database"></i>
+                        <span id="doc-count">386 Documentos</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Seguro y Privado</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Chat Container -->
+        <main class="main-content">
+            <div class="chat-container">
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="welcome-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h2>¡Hola! Soy tu asistente de seguros</h2>
+                        <p>Puedo ayudarte con información sobre pólizas, coberturas, y responder preguntas específicas sobre seguros.</p>
+                        <div class="example-questions">
+                            <h3>Preguntas de ejemplo:</h3>
+                            <div class="example-chips">
+                                <span class="example-chip" onclick="sendExampleQuestion('¿Qué coberturas tiene la póliza POL320190074?')">
+                                    Coberturas de póliza
+                                </span>
+                                <span class="example-chip" onclick="sendExampleQuestion('¿Hay cobertura para COVID-19?')">
+                                    Cobertura COVID-19
+                                </span>
+                                <span class="example-chip" onclick="sendExampleQuestion('¿Cuáles son los requisitos para hacer un reclamo?')">
+                                    Requisitos de reclamo
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            id="chatInput" 
+                            placeholder="Escribe tu pregunta sobre seguros aquí..."
+                            rows="1"
+                            maxlength="500"
+                        ></textarea>
+                        <button id="sendButton" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <span class="char-counter">
+                            <span id="charCount">0</span>/500
+                        </span>
+                        <span class="ai-powered">
+                            <i class="fas fa-magic"></i>
+                            Powered by AnyoneAI
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>
+                        <i class="fas fa-plus-circle"></i>
+                        Agregar Documentos
+                    </h3>
+                    <div class="upload-section">
+                        <!-- File Upload -->
+                        <div class="upload-card">
+                            <div class="upload-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <h4>Subir PDF</h4>
+                            <p>Agregar nuevas pólizas de seguro</p>
+                            <input type="file" id="pdfFileInput" accept=".pdf" style="display: none;">
+                            <button class="upload-btn" onclick="document.getElementById('pdfFileInput').click()">
+                                <i class="fas fa-upload"></i>
+                                Seleccionar PDF
+                            </button>
+                        </div>
+                        
+                        <!-- Text Input -->
+                        <div class="upload-card">
+                            <div class="upload-icon">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <h4>Texto Manual</h4>
+                            <p>Agregar documentos de texto</p>
+                            <button class="upload-btn" onclick="openTextUploadModal()">
+                                <i class="fas fa-pen"></i>
+                                Agregar Texto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>
+                        <i class="fas fa-cogs"></i>
+                        Gestión de Documentos
+                    </h3>
+                    <div class="management-section">
+                        <button class="management-btn" onclick="openDocumentManager()">
+                            <i class="fas fa-list"></i>
+                            <div class="btn-content">
+                                <span class="btn-title">Ver Documentos</span>
+                                <span class="btn-desc">Explorar y gestionar</span>
+                            </div>
+                        </button>
+                        
+                        <button class="management-btn clear-history-btn" onclick="clearChatHistory()">
+                            <i class="fas fa-broom"></i>
+                            <div class="btn-content">
+                                <span class="btn-title">Limpiar Historial</span>
+                                <span class="btn-desc">Nueva sesión de chat</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>
+                        <i class="fas fa-chart-bar"></i>
+                        Estadísticas
+                    </h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalQuestions">0</span>
+                                <span class="stat-label">Preguntas</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="totalSources">0</span>
+                                <span class="stat-label">Fuentes</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="avgResponseTime">0s</span>
+                                <span class="stat-label">Tiempo Prom.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>
+                        <i class="fas fa-history"></i>
+                        Historial
+                    </h3>
+                    <div class="chat-history" id="chatHistory">
+                        <div class="empty-history">
+                            <i class="fas fa-comments"></i>
+                            <p>No hay conversaciones anteriores</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Información
+                    </h3>
+                    <div class="info-cards">
+                        <div class="info-card">
+                            <i class="fas fa-shield-check"></i>
+                            <div>
+                                <h4>Datos Seguros</h4>
+                                <p>Toda la información se procesa de forma segura y privada</p>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <h4>IA Avanzada</h4>
+                                <p>Powered by ChromaDB y modelos de lenguaje avanzados</p>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-search"></i>
+                            <div>
+                                <h4>Búsqueda Semántica</h4>
+                                <p>Encuentra información relevante automáticamente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Procesando tu consulta...</p>
+            </div>
+        </div>
+
+        <!-- Error Toast -->
+        <div class="error-toast" id="errorToast">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage">Error al procesar la solicitud</span>
+            <button onclick="hideError()" class="close-error">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Text Upload Modal -->
+    <div class="modal-overlay" id="textUploadModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Agregar Documento de Texto</h3>
+                <button onclick="closeTextUploadModal()" class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="textUploadForm">
+                    <div class="form-group">
+                        <label for="docTitle">Título del Documento</label>
+                        <input type="text" id="docTitle" name="title" placeholder="Ej: Póliza de Seguro Dental" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="docType">Tipo de Documento</label>
+                        <select id="docType" name="document_type">
+                            <option value="policy_article">Artículo de Póliza</option>
+                            <option value="coverage_info">Información de Cobertura</option>
+                            <option value="claims_procedure">Procedimiento de Reclamos</option>
+                            <option value="general_document">Documento General</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="docText">Contenido del Documento</label>
+                        <textarea id="docText" name="content" rows="8" placeholder="Ingrese el contenido del documento aquí..." required></textarea>
+                    </div>
+                    <input type="hidden" name="source" value="manual">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeTextUploadModal()" class="btn-secondary">Cancelar</button>
+                <button onclick="submitTextDocument()" class="btn-primary">
+                    <i class="fas fa-save"></i> Guardar Documento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Progress Modal -->
+    <div class="modal-overlay" id="uploadProgressModal">
+        <div class="modal small-modal">
+            <div class="modal-body text-center">
+                <div class="upload-progress">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 id="uploadProgressTitle">Subiendo documento...</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="uploadProgressText">Procesando archivo...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="success-toast" id="successToast">
+        <i class="fas fa-check-circle"></i>
+        <span id="successMessage">Documento agregado exitosamente</span>
+        <button onclick="hideSuccess()" class="close-success">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Document Manager Modal -->
+    <div class="modal-overlay" id="documentManagerModal">
+        <div class="modal large-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Gestión de Documentos</h3>
+                <button onclick="closeDocumentManagerModal()" class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Document Filters -->
+                <div class="document-filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="filterSource">Fuente:</label>
+                            <select id="filterSource">
+                                <option value="">Todas</option>
+                                <option value="pdf_extraction">Extracción PDF</option>
+                                <option value="file_upload">Subida de Archivo</option>
+                                <option value="manual_input">Entrada Manual</option>
+                                <option value="structured_data">Datos Estructurados</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterDocumentType">Tipo:</label>
+                            <select id="filterDocumentType">
+                                <option value="">Todos</option>
+                                <option value="policy_article">Artículo de Póliza</option>
+                                <option value="coverage_info">Info de Cobertura</option>
+                                <option value="claims_procedure">Proc. Reclamos</option>
+                                <option value="general_document">Documento General</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterFileName">Nombre de Archivo:</label>
+                            <input type="text" id="filterFileName" placeholder="Buscar por nombre...">
+                        </div>
+                        <div class="filter-actions">
+                            <button class="btn-primary" onclick="documentManager.applyFilters()">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                            <button class="btn-secondary" onclick="documentManager.clearFilters()">
+                                <i class="fas fa-times"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Document List -->
+                <div id="documentManagerContent">
+                    <!-- Documents will be loaded here -->
+                </div>
+                
+                <!-- Pagination -->
+                <div id="documentPagination">
+                    <!-- Pagination will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document View Modal -->
+    <div class="modal-overlay" id="documentViewModal">
+        <div class="modal large-modal">
+            <div class="modal-header">
+                <h3 id="viewDocumentTitle">Ver Documento</h3>
+                <button onclick="closeDocumentViewModal()" class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="document-view">
+                    <div class="document-meta" id="viewDocumentMeta">
+                        <!-- Document metadata will be displayed here -->
+                    </div>
+                    <div class="document-content">
+                        <h4>Contenido:</h4>
+                        <pre id="viewDocumentContent"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global compatibility functions for HTML onclick handlers -->
+    <script>
+        // Global functions that will be connected to the modular components once they're loaded
+        let chatComponent, documentComponent, uiComponent, errorComponent;
+        
+        // Wait for the application to be ready
+        window.addEventListener('chatbotReady', (event) => {
+            const app = event.detail.app;
+            chatComponent = app.getComponent('chat');
+            documentComponent = app.getComponent('document');
+            uiComponent = app.getComponent('ui');
+            errorComponent = app.getComponent('error');
+        });
+        
+        // Global functions for HTML onclick handlers
+        window.sendMessage = function() {
+            if (chatComponent) chatComponent.sendMessage();
+        };
+        
+        window.sendExampleQuestion = function(question) {
+            if (chatComponent) {
+                chatComponent.setInputValue(question);
+                chatComponent.sendMessage();
+            }
+        };
+        
+        window.openTextUploadModal = function() {
+            if (documentComponent) documentComponent.openTextUploadModal();
+        };
+        
+        window.closeTextUploadModal = function() {
+            if (documentComponent) documentComponent.closeTextUploadModal();
+        };
+        
+        window.submitTextDocument = function() {
+            const form = document.getElementById('textUploadForm') || 
+                        document.querySelector('form'); // fallback
+            if (form && documentComponent) {
+                const event = new Event('submit', { bubbles: true, cancelable: true });
+                form.dispatchEvent(event);
+            }
+        };
+        
+        window.openDocumentManager = function() {
+            if (documentComponent) documentComponent.openDocumentManager();
+        };
+        
+        window.closeDocumentManagerModal = function() {
+            if (documentComponent) documentComponent.closeDocumentManagerModal();
+        };
+        
+        window.closeDocumentViewModal = function() {
+            if (uiComponent) uiComponent.closeModal('#documentViewModal');
+        };
+        
+        window.clearChatHistory = function() {
+            if (confirm('¿Está seguro de que desea borrar todo el historial de chat?')) {
+                if (window.insuranceChatbotApp) {
+                    const chatService = window.insuranceChatbotApp.getService('chat');
+                    if (chatService) chatService.clearChatHistory();
+                }
+                if (chatComponent) chatComponent.clearChatMessages();
+            }
+        };
+        
+        window.hideError = function() {
+            if (errorComponent) errorComponent.hideError();
+        };
+        
+        window.hideSuccess = function() {
+            // This will be handled by the toast system
+            const successToast = document.getElementById('successToast');
+            if (successToast) successToast.classList.remove('show');
+        };
+        
+        // Document manager object for compatibility
+        window.documentManager = {
+            applyFilters: function() {
+                if (documentComponent) {
+                    const filters = {
+                        source: document.getElementById('filterSource')?.value || '',
+                        document_type: document.getElementById('filterDocumentType')?.value || '',
+                        file_name: document.getElementById('filterFileName')?.value || ''
+                    };
+                    documentComponent.setFilters(filters);
+                }
+            },
+            clearFilters: function() {
+                if (documentComponent) documentComponent.clearFilters();
+                // Clear form inputs
+                const filterInputs = ['filterSource', 'filterDocumentType', 'filterFileName'];
+                filterInputs.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.value = '';
+                });
+            },
+            loadDocuments: function(page) {
+                if (documentComponent) documentComponent.loadDocuments(page);
+            }
+        };
+    </script>
+    
+    <!-- Load the modular application -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

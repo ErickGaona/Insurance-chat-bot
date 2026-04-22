@@ -1,0 +1,53 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: insurance-chatbot-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - FLASK_ENV=production
+      - CHROMA_DB_PATH=/app/chroma_db
+      - UPLOAD_FOLDER=/app/uploads
+    volumes:
+      - ./backend/chroma_db:/app/chroma_db
+      - ./backend/uploads:/app/uploads
+      - ./data:/app/data:ro  # Mount data directory as read-only
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: insurance-chatbot-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - chatbot-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  chatbot-network:
+    driver: bridge
+
+volumes:
+  chroma_data:
+  uploads_data:

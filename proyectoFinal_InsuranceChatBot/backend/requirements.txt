@@ -1,0 +1,13 @@
+pandas
+PyMuPDF
+sentence-transformers
+openai
+numpy
+chromadb
+flask
+flask-cors
+python-dotenv
+google-generativeai
+requests
+langchain
+langchain-google-genai
